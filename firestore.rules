@@ -1,0 +1,43 @@
+rules_version = '2';
+// Règles de sécurité Firestore pour Fantasy Worlds 2026.
+// À coller dans la console Firebase > Firestore Database > onglet « Règles », puis « Publier ».
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Stats et programme : lisibles par les joueurs connectés,
+    // écrits uniquement par la fonction Netlify (compte de service).
+    match /stats/{day} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /schedule/{day} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Ligues : tout joueur connecté peut lire et rejoindre ;
+    // seul le créateur peut supprimer sa ligue.
+    match /leagues/{lid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+
+      // Draft, compos, mercato, affiches de la ligue
+      match /{sub=**} {
+        allow read, write: if request.auth != null;
+      }
+    }
+
+    // Présence en direct (survol pendant la draft) : chacun n'écrit que la sienne.
+    match /presence/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Verrous courts pour éviter deux choix simultanés
+    match /_leases/{id} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
