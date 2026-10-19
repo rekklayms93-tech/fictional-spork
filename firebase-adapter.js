@@ -11,15 +11,15 @@
   // ---------- Login screen ----------
   const css = `
   #fw-login{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;
-    background:radial-gradient(ellipse 90% 60% at 50% -10%, #0B2236 0%, #010A13 70%);color:#CDBE91;font-family:"Barlow",system-ui,sans-serif}
-  #fw-login .box{display:grid;gap:16px;justify-items:center;text-align:center;max-width:420px}
-  #fw-login .t{font-family:"Cinzel",Georgia,serif;font-weight:800;font-size:clamp(28px,7vw,44px);letter-spacing:.06em;text-transform:uppercase;color:#F0E6D2;line-height:1.05}
-  #fw-login .t span{color:#C8AA6E}
-  #fw-login p{margin:0;color:#7B8794;line-height:1.5}
-  #fw-login button{font-family:"Cinzel",Georgia,serif;font-weight:800;font-size:16px;letter-spacing:.1em;text-transform:uppercase;padding:13px 30px;border:2px solid #C8AA6E;background:linear-gradient(180deg,#0E1A2C,#091428);color:#F0E6D2;cursor:pointer}
-  #fw-login button:hover{box-shadow:0 0 16px rgba(200,170,110,.45)}
-  #fw-login .err{color:#E84057;font-size:14px}
-  #fw-logout{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;font:600 12px "Barlow",system-ui,sans-serif;padding:6px 10px;border-radius:6px;border:1px solid rgba(127,127,127,.4);background:rgba(20,27,43,.85);color:#EEF2FA;cursor:pointer}`;
+    background:radial-gradient(ellipse 90% 60% at 50% -10%, #1C1C1C 0%, #050505 70%);color:#CFCFCF;font-family:"Archivo",Arial,system-ui,sans-serif}
+  #fw-login .box{display:grid;gap:18px;justify-items:center;text-align:center;max-width:440px}
+  #fw-login .t{font-family:"Archivo",Arial,sans-serif;font-stretch:125%;font-weight:900;font-size:clamp(30px,7vw,48px);letter-spacing:-.01em;text-transform:uppercase;color:#FFFFFF;line-height:1}
+  #fw-login .t span{color:transparent;-webkit-text-stroke:1.2px #FFFFFF}
+  #fw-login p{margin:0;color:#8A8A8A;line-height:1.5}
+  #fw-login button{font-family:"Archivo",Arial,sans-serif;font-stretch:125%;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;padding:14px 30px;border:0;background:#FFFFFF;color:#050505;cursor:pointer}
+  #fw-login button:hover{background:#D9D9D9}
+  #fw-login .err{color:#FF5A5F;font-size:14px}
+  #fw-logout{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;font:600 12px "Archivo",Arial,system-ui,sans-serif;padding:7px 11px;border-radius:2px;border:1px solid #3A3A3A;background:#0B0B0B;color:#FFFFFF;cursor:pointer}`;
   const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
 
   function loginScreen(message){
