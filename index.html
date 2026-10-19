@@ -426,38 +426,19 @@ tr.lead .rank{color:var(--turn)}
 @keyframes fa-hit{0%{transform:scale(1.06)}100%{transform:none}}
 @media (max-width:560px){ #fw-anim .fa-duel{gap:6px} #fw-anim .fa-slot{padding:9px 8px;min-height:54px} #fw-anim .fa-slot b{font-size:15px} #fw-anim .fa-slot small{font-size:10.5px} #fw-anim .fa-vs{font-size:15px} }
 @media (prefers-reduced-motion: reduce){ #fw-anim *, #fw-anim{animation-duration:.01s!important;animation-delay:0s!important} }
-/* ===== Photos on cards ===== */
+/* ===== Card figure ===== */
 .fut > div{position:relative;z-index:1}
-.fut .f-photo{position:absolute;z-index:0;right:0;top:0;width:74%;bottom:62px;background-size:cover;background-position:center top;
-  filter:grayscale(1) contrast(1.08);
-  -webkit-mask-image:linear-gradient(to bottom,#000 58%,transparent 100%),linear-gradient(to right,transparent 0,#000 28%);
-  -webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 58%,transparent 100%),linear-gradient(to right,transparent 0,#000 28%);mask-composite:intersect}
-.fut.has-ph .f-top{flex-direction:column;align-items:flex-start;gap:4px}
-.fut.has-ph .f-side{justify-items:start;gap:3px}
-.fut.has-ph .f-ovr{text-shadow:0 1px 6px color-mix(in srgb,var(--b) 70%,transparent)}
-.fut.has-ph.taken .f-photo{opacity:.6}
-body.ph-color .fut .f-photo,body.ph-color .csp-av,body.ph-color .ph-frame canvas{filter:none}
-.csp-av{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;background-size:cover;background-position:center top;filter:grayscale(1);box-shadow:0 0 0 1px var(--cs-line)}
+/* Generic figure on every card: a silhouette for players, a crest for teams (no photos) */
+.fut .f-sil{position:absolute;z-index:0;right:4%;top:8px;width:58%;height:calc(100% - 78px);color:var(--i);opacity:.2;pointer-events:none}
+.fut.t-legend .f-sil{opacity:.16}
+.fut .f-top{flex-direction:column;align-items:flex-start;gap:4px}
+.fut .f-side{justify-items:start;gap:3px}
 .ph-teams{display:grid;gap:22px}
 .ph-team h3{margin:0 0 10px;display:flex;gap:10px;align-items:baseline}
 .ph-team h3 small{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
 .ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
 .ph-cell{display:grid;gap:6px;min-width:0}
 .ph-cell .fut{cursor:pointer}
-.ph-acts{display:flex;gap:4px;flex-wrap:wrap}
-.ph-acts label.btn{position:relative;overflow:hidden}
-.ph-acts input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-.ph-count{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
-#ph-modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.72)}
-#ph-modal .box{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--rad);padding:18px;display:grid;gap:14px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto}
-#ph-modal .cols{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
-#ph-modal .ph-frame{background:var(--sunk);line-height:0;touch-action:none;cursor:grab;justify-self:center}
-#ph-modal .ph-frame canvas{width:180px;height:240px;filter:grayscale(1) contrast(1.08)}
-#ph-modal .ctl{display:grid;gap:12px}
-#ph-modal .ctl label{display:grid;gap:4px;font-size:13px;font-weight:600}
-#ph-modal input[type=range]{width:100%}
-#ph-modal .err{color:var(--bad);font-size:13px}
-@media (max-width:520px){ #ph-modal .cols{grid-template-columns:1fr} }
 /* ===== Ultimate Team style cards ===== */
 .fut{--a:var(--fut-pro-a);--b:var(--fut-pro-b);--i:var(--fut-pro-ink);--e:var(--fut-pro-edge);
   position:relative;display:grid;grid-template-rows:auto 1fr auto auto;gap:5px;min-height:172px;min-width:0;padding:11px 11px 9px;
@@ -567,9 +548,8 @@ function seasonLine(pid){
 }
 function futCard(pid, o){
   o = o || {}; const p = PLAYERS[pid]; const L = seasonLine(pid); const team = p.role==='TEAM';
-  const ph = hasPhoto(pid);
-  return `<button class="fut t-${team?'team':tierOf(p.ovr)} ${ph?'has-ph':''} ${o.cls||''}" ${o.attr||''} ${o.disabled?'disabled':''} title="${esc(p.name)} · ${p.team} · ${ROLE_FR[p.role]} · note ${p.ovr}">
-    ${o.hover ? `<span class="hv">${o.hover}</span>` : ''}${ph ? `<i class="f-photo ph-${pid}" aria-hidden="true"></i>` : ''}
+  return `<button class="fut t-${team?'team':tierOf(p.ovr)} ${o.cls||''}" ${o.attr||''} ${o.disabled?'disabled':''} title="${esc(p.name)} · ${p.team} · ${ROLE_FR[p.role]} · note ${p.ovr}">
+    ${o.hover ? `<span class="hv">${o.hover}</span>` : ''}${figure(p)}
     <div class="f-top"><span class="f-ovr">${p.ovr}</span><span class="f-side">${roleIcon(p.role,20)}<span class="f-team">${p.team}</span></span></div>
     <div class="f-name ${p.name.length>14?'xlong':(p.name.length>8?'long':'')}">${esc(p.name)}</div>
     <div class="f-attr">${ATTR[team?'TEAM':'PLAYER'].map(([k,ab])=>`<span><b>${p.attr[k]}</b>${ab}</span>`).join('')}</div>
@@ -704,7 +684,7 @@ function teamPoints(t){
 const S = {db:null, me:null, isOwner:false, readOnly:false,
   config:null, picks:[], lineups:{}, stats:{}, schedule:{}, moves:[], matchups:{},
   tab:'classement', viewSeat:null, dayId:null, poolRole:'ALL', poolTeam:'ALL', poolQuery:'', pending:null,
-  tx:null, faRole:'ALL', confirmReset:false, room:null, peers:[], loaded:{config:false,picks:false,moves:false,matchups:false,leagues:false}, genBusy:{}, lid:null, leagues:[], joinCode:null, invite:undefined, photos:{}, photoMsg:''};
+  tx:null, faRole:'ALL', confirmReset:false, room:null, peers:[], loaded:{config:false,picks:false,moves:false,matchups:false,leagues:false}, genBusy:{}, lid:null, leagues:[], joinCode:null, invite:undefined};
 let M = null; // computed model
 
 const $ = s => document.querySelector(s);
@@ -722,7 +702,8 @@ const lockOf = d => new Date((S.config?.locks||{})[d.id] || d.lock);
 const isLocked = d => Date.now() >= lockOf(d).getTime();
 const seats = () => S.config?.seats || [];
 const N = () => seats().length;
-const seatName = i => seats()[i]?.name || '—';
+// Unclaimed seats all share the default name: number them so duels and the draw stay readable
+const seatName = i => { const st = seats()[i]; if(!st) return '—'; const n = st.name || ''; return (!st.uid && (!n || /^place libre$/i.test(n.trim()))) ? 'Place libre '+(i+1) : (n || '—'); };
 const totalPicks = () => N()*PICKS_PER_SEAT;
 const pname = pid => PLAYERS[pid]?.name || '—';
 
@@ -1018,7 +999,7 @@ function render(){
     if(b.dataset.tab==='mercato'){ const has = M && canActFor(S.viewSeat??-1) && todo(S.viewSeat); b.innerHTML = 'Mercato'+(has?'<span class="badge" aria-label="Action à faire"></span>':''); }
   });
   const v = $('#view');
-  const free = {ligues:viewLeagues, regles:viewRules, cartes:viewPhotos}[S.tab];
+  const free = {ligues:viewLeagues, regles:viewRules, cartes:viewCards}[S.tab];
   if(!S.db && !free){ v.innerHTML = noDb(); return; }
   const ready = S.lid && S.loaded.config && S.loaded.picks && S.loaded.moves && S.loaded.matchups;
   let fn = free || (S.db && S.loaded.leagues && !S.lid ? noLeague : null) || (ready ? (S.config ? {classement:viewStandings, draft:viewDraft, compo:viewLineup, mercato:viewMercato, journees:viewDays}[S.tab] : noLeague) : null);
@@ -1140,7 +1121,7 @@ function csPlayer(i, side, mode){
   const hovSlot = hov ? slotFor(R, PLAYERS[hov]) : null;
   const row = (slot, label, rc) => {
     const pid = R[slot]; const isHov = !pid && hovSlot===slot;
-    return `<div class="csp-row ${slot==='TEAM'?'team':''}"><span class="rl" style="--rc:var(--r-${rc})" title="${SLOT_FR[slot]||''}">${label}</span><span class="pv ${pid?'':(isHov?'hover':'empty')}" title="${pid?esc(pname(pid)):''}">${pid?ovrMini(pid)+avatar(pid)+esc(pname(pid)):(isHov?ovrMini(hov)+avatar(hov)+esc(pname(hov)):'—')}</span></div>`;
+    return `<div class="csp-row ${slot==='TEAM'?'team':''}"><span class="rl" style="--rc:var(--r-${rc})" title="${SLOT_FR[slot]||''}">${label}</span><span class="pv ${pid?'':(isHov?'hover':'empty')}" title="${pid?esc(pname(pid)):''}">${pid?ovrMini(pid)+esc(pname(pid)):(isHov?ovrMini(hov)+esc(pname(hov)):'—')}</span></div>`;
   };
   const subs = [R.SUB1, R.SUB2].map((pid,k)=> pid ? esc(pname(pid)) : (hovSlot===('SUB'+(k+1)) ? `<i>${esc(pname(hov))}</i>` : '—')).join(' · ');
   const join = mode==='lobby' && !seat.uid && me===null && S.me && !S.readOnly ? `<button class="ghost join" data-claim="${i}">Rejoindre cette place</button>` : '';
@@ -1226,7 +1207,7 @@ function viewLobby(){
 }
 
 function j1Draw(){
-  const pairs = S.matchups.d01?.pairs;
+  const pairs = j1Ready();
   if(!pairs) return `<div class="cs-j1"><div class="cs-phase">Tirage du premier match</div><p>Tirage au sort en cours…</p></div>`;
   return `<div class="cs-j1"><div class="cs-phase">Tirage au sort · Premier match · ${esc(dayLong(DAYS[0]))}</div><button class="ghost" id="fa-replay" style="justify-self:center">Revoir le tirage</button>
     <div class="duels">${pairs.map(([a,b])=>duelCard(a,b,null,null,null)).join('')}</div></div>`;
@@ -1471,38 +1452,15 @@ function viewRules(){
     <div class="row"><button class="btn" id="save-locks">Enregistrer les verrous</button>${!isLocked(nd)?`<button class="btn" id="regen-pairs">Retirer les affiches de la J${nd.n}</button>`:''}</div>
     <div class="row">${S.confirmReset ? '<span class="err">Tout effacer (draft, compos, mercato, affiches) et revenir au salon ? Les joueurs gardent leur place.</span><button class="btn" id="reset-no">Non</button><button class="btn danger" id="reset-yes">Oui, réinitialiser</button>' : '<button class="btn danger" id="reset-ask">Réinitialiser la partie</button>'}</div>
   </section>` : '';
-  return `<section class="stack"><div><h2>Règles</h2><p class="lede">Inspiré de l’ancien LoL Fantasy de Riot, en duels quotidiens avec mercato.</p></div>
+  return `<section class="stack"><div><h2>Règles</h2><p class="lede">Duels quotidiens, barèmes de points et mercato.</p></div>
   <div class="rules-grid">
-    <div class="panel prose"><h3>Draft</h3><ul>
-      <li>2, 4, 6, 8 ou 10 joueurs (2 pour tester ou jouer en tête-à-tête).</li>
-      <li>Salon : chacun rejoint sa place et clique sur Prêt.</li>
-      <li>Roulette du first pick : chacun tire un nombre de 1 à 100 (jamais deux fois le même). Le plus gros score choisit en premier, puis ordre décroissant.</li>
-      <li>Draft en serpent, poste par poste : tour 1 les Tops, tour 2 les Junglers, tour 3 les Mids, tour 4 les ADC, tour 5 les Supports, tour 6 les équipes pros, tours 7 et 8 les 2 remplaçants (n’importe quel joueur, pas d’équipe).</li>
-      <li>Comme en sélection des champions : tu survoles un joueur (les autres le voient), puis tu verrouilles.</li>
-      <li>Limites de ton effectif : 1 seul joueur par équipe pro (si tu as Caliste, plus aucun autre joueur de Karmine Corp), un seul joueur noté 92 ou plus, un seul joueur noté 90 ou 91. Le choix d’équipe du tour 6 n’est pas concerné.</li>
-      <li>Un pro n’appartient qu’à une seule équipe à la fois.</li></ul></div>
     <div class="panel prose"><h3>Duels</h3><ul>
-      <li>Chaque jour de Worlds, chacun affronte un autre joueur.</li>
+      <li>Chaque jour de Worlds, chacun affronte un autre joueur de la ligue.</li>
       <li>J1 tirée au sort dès la fin de la draft, puis affiches façon Swiss : on affronte quelqu’un qui a le même bilan, sans revanche quand c’est possible.</li>
       <li>Avant le premier match du jour, chacun valide un titulaire par poste. L’équipe choisie compte toujours. Sans changement, la compo précédente est reprise.</li>
-      <li>Le plus gros total gagne le duel. Égalité parfaite = nul.</li></ul></div>
-    <div class="panel prose"><h3>Cartes et notes</h3><ul>
-      <li>Chaque joueur et chaque équipe a une carte façon Ultimate Team avec une note sur 100.</li>
-      <li>La note estime le niveau avant les Worlds, d’après le top 20 des experts de Sheep Esports, les classements par poste de Strafe et le power ranking des équipes (octobre 2026), puis ajustée selon nos propres analyses. Elle sert de repère pour la draft et ne compte pas dans les points.</li>
-      <li>Couleur des cartes : blanche pour 90 et plus, noire pour 85-89, bronze pour 80-84, fonte terne pour 79 et moins, bleu acier pour les équipes.</li>
-      <li>Sous-notes (Early game, Mécanique, Teamfight, Macro, Farm, Vision ; pour les équipes : Early game, Objectifs, Teamfight, Macro, Constance, Draft) : estimées par Claude d’après le style de jeu, réparties autour de la note globale. Clique sur une carte dans l’onglet Cartes, ou sur « Fiche » pendant la draft, pour voir le détail et la forme réelle aux Worlds.</li>
-      <li>90 et plus : carte blanche. 85 à 89 : noire, liseré blanc. 80 à 84 : graphite. Moins de 80 : sombre.</li>
-      <li>En bas de la carte : moyenne de points fantasy, KDA et CS par partie aux Worlds (pour une équipe : séries gagnées-perdues et nombre de games), mis à jour avec les stats.</li></ul></div>
-    <div class="panel prose"><h3>Jours sans match</h3><ul>
-      <li>Seuls tes 5 titulaires et ton équipe rapportent des points. Les 2 remplaçants ne marquent jamais : ils bloquent 2 joueurs sur ton banc et peuvent entrer dans ta compo avant une journée si tu le décides.</li>
-      <li>Repos : un joueur (ou l’équipe choisie) dont l’équipe est encore en lice mais ne joue pas ce jour-là, par exemple qualifiée à 3-0, marque sa moyenne des journées précédentes.</li>
-      <li>Éliminé : si son équipe est éliminée (3 défaites en Swiss, ou une série perdue en phase finale), il marque la moitié de sa moyenne. Pense à le remplacer au mercato.</li></ul></div>
-    <div class="panel prose"><h3>Mercato</h3><ul>
-      <li>Une fois les stats validées, le gagnant prend un joueur de son choix au perdant (titulaire, banc ou équipe) et relâche un des siens. Équipe contre équipe.</li>
-      <li>Le perdant complète gratuitement son effectif avec un pro libre (une équipe s’il a perdu son équipe).</li>
-      <li>Ensuite, chacun peut faire ${MAX_SWAPS} changements avec les pros libres avant la journée suivante.</li>
-      <li>Chaque effectif garde 8 choix : 1 équipe et au moins 1 joueur par poste.</li>
-      <li>Tout doit être fait avant le verrouillage de la journée suivante.</li></ul></div>
+      <li>Seuls tes 5 titulaires et ton équipe rapportent des points. Les 2 remplaçants ne marquent jamais : ils restent sur ton banc et peuvent entrer dans ta compo avant une journée.</li>
+      <li>Le plus gros total gagne le duel. Égalité parfaite = nul. Classement : victoires, puis nuls, puis total de points.</li>
+      <li>Équipe au repos ce jour-là (encore en lice mais sans match) : le joueur marque sa moyenne des journées précédentes. Équipe éliminée : la moitié de sa moyenne.</li></ul></div>
     <div class="panel"><h3>Barème joueur</h3><p class="muted small" style="margin:0 0 6px">Calculé partie par partie, puis on fait la moyenne des parties du jour : un Bo3 compte autant qu’un Bo1.</p><table class="scale"><tbody>
       <tr><td>Kill</td><td>+${SCORE.k}</td></tr><tr><td>Mort</td><td>0</td></tr><tr><td>Assist</td><td>+1,5</td></tr>
       <tr><td>Sbire tué (CS)</td><td>+0,04</td></tr><tr><td>Point de score de vision</td><td>+0,1</td></tr>
@@ -1515,6 +1473,12 @@ function viewRules(){
       <tr><td>Dragon</td><td>+${SCORE.tDr} chacun</td></tr><tr><td>Baron</td><td>+${SCORE.tBn} chacun</td></tr><tr><td>Larve du Néant (grub)</td><td>+${SCORE.tGr} chacune</td></tr>
       <tr><td>Série Bo1 gagnée</td><td>0</td></tr><tr><td>Série Bo3 gagnée</td><td>+${SCORE.tBo3}</td></tr><tr><td>Série Bo5 gagnée</td><td>+${SCORE.tBo5}</td></tr></tbody></table>
       <p class="muted small">Exemple Bo1 : victoire avec 3 dragons, 1 baron et 3 grubs = 20 + 9 + 4 + 6 = 39 pts. En Bo3 gagné 2-0 avec 39 et 33 pts, la moyenne fait 36 pts, plus 5 pour la série = 41 pts.</p></div>
+    <div class="panel prose"><h3>Mercato</h3><ul>
+      <li>Une fois les stats de la journée validées, le gagnant de chaque duel prend un joueur de son choix au perdant (titulaire, banc ou équipe) et relâche un des siens. Équipe contre équipe.</li>
+      <li>Le perdant complète gratuitement son effectif avec un pro libre (une équipe s’il a perdu son équipe).</li>
+      <li>Ensuite, chacun peut faire ${MAX_SWAPS} transferts maximum avec les joueurs et équipes libres (sans propriétaire) avant la journée suivante.</li>
+      <li>Chaque effectif garde 8 choix : 1 équipe et au moins 1 joueur par poste.</li>
+      <li>Tout doit être fait avant le verrouillage de la journée suivante.</li></ul></div>
   </div></section>${admin}`;
 }
 function toLocalInput(d){ const z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
@@ -1623,7 +1587,10 @@ async function resetAll(){
 async function maybeGenerate(){
   if(!M || S.readOnly || !S.config || !N() || (!isComm() && mySeat()===null)) return;
   let k = -1, how = 'swiss';
-  if(!S.matchups.d01){ if(draftDone()){ k = 0; how = 'tirage fin de draft'; } }
+  // J1 is drawn once the draft is over. Leagues created before that rule had their J1 drawn at creation:
+  // that old draw is replaced by a real end-of-draft draw, as long as J1 has not started.
+  const d01 = S.matchups.d01;
+  if(!d01 || (d01.how!==J1_HOW && draftDone() && !isLocked(DAYS[0]))){ if(draftDone()){ k = 0; how = J1_HOW; } }
   else for(let j=1;j<DN;j++){ if(!S.matchups[DAYS[j].id] && S.matchups[DAYS[j-1].id] && M.results[j-1]?.final){ k=j; break; } }
   if(k<0 || S.genBusy[k]) return;
   S.genBusy[k] = true;
@@ -1631,10 +1598,14 @@ async function maybeGenerate(){
     const ref = S.db.doc(LG()+'/matchups/'+DAYS[k].id);
     const lease = await ref.acquire({holder:S.me||'owner', ttlMs:5000});
     if(!lease.acquired) return;
-    const snap = await ref.get(); if(snap.exists && snap.data().pairs) return;
+    const snap = await ref.get(); const cur = snap.exists ? snap.data() : null;
+    if(cur && cur.pairs && (k>0 || cur.how===J1_HOW)) return;
     await ref.set({pairs: k===0 ? randomPairs() : swissPairs(k), createdAt:new Date().toISOString(), how});
   }catch(e){ S.genBusy[k] = false; }
+  finally{ setTimeout(() => { S.genBusy[k] = false; }, 4000); } // retry later if another player held the lease and did not finish
 }
+const J1_HOW = 'tirage fin de draft';
+const j1Ready = () => { const d = S.matchups?.d01; return d && Array.isArray(d.pairs) && d.pairs.length && d.how===J1_HOW ? d.pairs : null; };
 
 // ---------- Leagues ----------
 const APP_URL = location.origin + location.pathname;
@@ -1760,104 +1731,22 @@ async function copyInvite(){
 }
 
 
-// ---------- Photos (added by the players themselves, stored in db "photos/{pid}") ----------
-const PHOTO_W = 240, PHOTO_H = 320;
-const PHOTO_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
-const hasPhoto = pid => !!(S.photos && S.photos[pid]);
-function applyPhotoCss(){
-  let el = document.getElementById('ph-css');
-  if(!el){ el = document.createElement('style'); el.id = 'ph-css'; document.head.appendChild(el); }
-  el.textContent = Object.entries(S.photos||{}).map(([pid,img]) => `.ph-${pid}{background-image:url("${img}")}`).join('\n');
-}
-const avatar = pid => hasPhoto(pid) ? `<i class="csp-av ph-${pid}" aria-hidden="true"></i>` : '';
-function photoColor(on){ document.body.classList.toggle('ph-color', !!on); }
-
-function viewPhotos(){
-  const n = Object.keys(S.photos||{}).filter(k=>PLAYERS[k]).length, total = Object.keys(PLAYERS).length;
-  const canEdit = !!S.db && !S.readOnly && !!S.me;
-  const color = store.get('fw-ph-color')==='1';
-  const cell = pid => `<div class="ph-cell">${futCard(pid, {attr:`data-fiche="${pid}" title="Voir la fiche"`})}
-      ${canEdit ? `<div class="ph-acts"><label class="btn sm">${hasPhoto(pid)?'Changer':'Ajouter une photo'}<input type="file" accept="image/*" data-photo="${pid}" aria-label="Photo de ${esc(PLAYERS[pid].name)}"></label>${hasPhoto(pid)?`<button class="btn sm" data-unphoto="${pid}">Retirer</button>`:''}</div>` : ''}</div>`;
+// ---------- Card figure: same generic silhouette for every player, a crest with the team code for teams ----------
+const SIL_PLAYER = '<svg class="f-sil" viewBox="0 0 100 120" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><circle cx="50" cy="36" r="21" fill="currentColor"/><path d="M8 120c0-34 18-52 42-52s42 18 42 52z" fill="currentColor"/></svg>';
+const figure = p => p.role==='TEAM'
+  ? `<svg class="f-sil" viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M50 6 88 19v36c0 30-17 49-38 59C29 104 12 85 12 55V19z" fill="none" stroke="currentColor" stroke-width="6"/><path d="M50 22 74 30v24c0 20-10 33-24 40-14-7-24-20-24-40V30z" fill="currentColor" opacity=".18"/><text x="50" y="66" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="900" font-size="${p.team.length>3?17:22}" fill="currentColor">${p.team}</text></svg>`
+  : SIL_PLAYER;
+function viewCards(){
+  const cell = pid => `<div class="ph-cell">${futCard(pid, {attr:`data-fiche="${pid}" title="Voir la fiche"`})}</div>`;
   return `<div class="panel stack">
     <h2>Cartes</h2>
-    <p class="lede">Ajoute une photo sur la carte d’un joueur, ou le logo d’une équipe. Choisis l’image, recadre-la, puis enregistre. Toutes les cartes ont le même cadre, et les photos sont visibles par tous les joueurs, dans toutes les ligues. Utilise des images que vous avez le droit d’utiliser.</p>
-    <div class="row" style="gap:14px;align-items:center;flex-wrap:wrap">
-      <span class="ph-count">${n} / ${total} cartes illustrées</span>
-      <label class="row" style="gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="ph-color" ${color?'checked':''}> Photos en couleur (sinon noir et blanc)</label>
-    </div>
-    ${canEdit ? '' : '<p class="muted">Connecte-toi pour ajouter des photos.</p>'}
-    ${S.photoMsg ? `<p class="muted" role="status">${esc(S.photoMsg)}</p>` : ''}
+    <p class="lede">Toutes les cartes, rangées par équipe : la carte de l’équipe, puis ses 5 joueurs. Clique sur une carte pour voir sa fiche (sous-notes et forme aux Worlds).</p>
   </div>
   <div class="ph-teams" style="margin-top:16px">${TEAMS.map(t => `<section class="ph-team">
     <h3>${esc(t.name)} <small>${t.code}</small></h3>
     <div class="ph-grid">${[t.code+'-TEAM', ...ROLES.map(r=>t.code+'-'+r)].map(cell).join('')}</div>
   </section>`).join('')}</div>`;
 }
-
-// Crop editor (kept outside render() so live updates never reset it)
-let PE = null;
-function openPhotoEditor(pid, file){
-  if(!file || !/^image\//.test(file.type)){ return; }
-  const url = URL.createObjectURL(file); const img = new Image();
-  img.onload = () => {
-    const team = PLAYERS[pid].role==='TEAM';
-    PE = {pid, img, url, team, zoom: 1, x: 0, y: team ? 0 : 1};
-    const m = document.createElement('div'); m.id = 'ph-modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Recadrer la photo');
-    m.innerHTML = `<div class="box">
-      <h3 style="margin:0">${esc(PLAYERS[pid].name)} <span class="muted" style="font-weight:500">· ${PLAYERS[pid].team} · ${ROLE_FR[PLAYERS[pid].role]}</span></h3>
-      <div class="cols">
-        <div class="ph-frame" id="ph-frame"><canvas id="ph-cv" width="${PHOTO_W}" height="${PHOTO_H}"></canvas></div>
-        <div class="ctl">
-          <label>Zoom <input type="range" id="ph-zoom" min="${team?0.4:1}" max="3" step="0.01" value="1"></label>
-          <label>Gauche / droite <input type="range" id="ph-x" min="-1" max="1" step="0.01" value="0"></label>
-          <label>Haut / bas <input type="range" id="ph-y" min="-1" max="1" step="0.01" value="${team?0:1}"></label>
-          <p class="muted" style="margin:0;font-size:13px">Tu peux aussi faire glisser l’image. ${team?'Pour un logo, dézoome pour le voir en entier.':'Garde le visage en haut du cadre : le bas de la carte est réservé au pseudo.'}</p>
-          <div class="err" id="ph-err"></div>
-        </div>
-      </div>
-      <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" id="ph-cancel">Annuler</button><button class="btn primary" id="ph-save">Enregistrer</button></div>
-    </div>`;
-    document.body.appendChild(m);
-    drawPE();
-    const fr = document.getElementById('ph-frame'); let drag = null;
-    fr.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY, px:PE.x, py:PE.y}; fr.setPointerCapture(e.pointerId); });
-    fr.addEventListener('pointermove', e => { if(!drag || !PE) return; const g = geomPE(); const k = PHOTO_W/180;
-      if(g.mx>0) PE.x = Math.max(-1, Math.min(1, drag.px + (e.clientX-drag.x)*k/g.mx));
-      if(g.my>0) PE.y = Math.max(-1, Math.min(1, drag.py + (e.clientY-drag.y)*k/g.my));
-      document.getElementById('ph-x').value = PE.x; document.getElementById('ph-y').value = PE.y; drawPE(); });
-    fr.addEventListener('pointerup', () => drag = null);
-    m.addEventListener('keydown', e => { if(e.key==='Escape') closePhotoEditor(); });
-    document.getElementById('ph-save').focus();
-  };
-  S.photoMsg = '';
-  img.onerror = () => { URL.revokeObjectURL(url); alertPhoto('Image illisible. Essaie un fichier JPG ou PNG.'); };
-  img.src = url;
-}
-function alertPhoto(msg){ S.photoMsg = msg; render(); }
-function geomPE(){
-  const {img, zoom} = PE; const base = Math.max(PHOTO_W/img.naturalWidth, PHOTO_H/img.naturalHeight);
-  const sc = base*zoom, dw = img.naturalWidth*sc, dh = img.naturalHeight*sc;
-  return {dw, dh, mx: Math.abs(dw-PHOTO_W)/2, my: Math.abs(dh-PHOTO_H)/2};
-}
-function drawPE(){
-  const cv = document.getElementById('ph-cv'); if(!cv || !PE) return; const c = cv.getContext('2d');
-  const g = geomPE();
-  const dx = (PHOTO_W-g.dw)/2 + PE.x*g.mx, dy = (PHOTO_H-g.dh)/2 + PE.y*g.my;
-  c.clearRect(0,0,PHOTO_W,PHOTO_H);
-  if(!PE.team){ c.fillStyle = '#1A1A1A'; c.fillRect(0,0,PHOTO_W,PHOTO_H); }
-  c.imageSmoothingQuality = 'high'; c.drawImage(PE.img, dx, dy, g.dw, g.dh);
-}
-function closePhotoEditor(){ if(PE) URL.revokeObjectURL(PE.url); PE = null; document.getElementById('ph-modal')?.remove(); }
-async function savePhoto(){
-  if(!PE || !S.db) return; const cv = document.getElementById('ph-cv'); const btn = document.getElementById('ph-save');
-  let data = PE.team ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.84);
-  if(PE.team && data.length > 180000) data = cv.toDataURL('image/webp', 0.9);
-  if(!PHOTO_RE.test(data) || data.length > 180000) data = cv.toDataURL('image/jpeg', 0.72);
-  btn.disabled = true; btn.textContent = 'Enregistrement…';
-  try{ await S.db.collection('photos').doc(PE.pid).set({img:data, by:S.me||'', at:new Date().toISOString()}); closePhotoEditor(); }
-  catch(e){ btn.disabled = false; btn.textContent = 'Enregistrer'; const el = document.getElementById('ph-err'); if(el) el.textContent = e && e.code==='quota_exceeded' ? 'Espace de stockage plein : retire quelques photos.' : 'Enregistrement impossible, réessaie.'; }
-}
-async function removePhoto(pid){ if(!S.db) return; try{ await S.db.collection('photos').doc(pid).delete(); }catch(_){ } }
 
 
 // ---------- Sounds (original, synthesized with Web Audio: nothing copied from the game) ----------
@@ -1936,15 +1825,16 @@ let FA = null; // {timers:[], lid}
 const faSeen = lid => store.get('fw-drawshow:'+lid)==='1';
 function maybeDraftShow(){
   if(FA || !S.lid || !S.config || S.config.status!=='draft' || !S.loaded.picks || !draftDone()) return;
-  if(faSeen(S.lid)) return;
-  const t = lastPickTime(); if(t && Date.now()-t > 48*3600*1000){ store.set('fw-drawshow:'+S.lid,'1'); return; } // old draft: no surprise show days later
-  if(document.getElementById('ph-modal')) return;
+  // Shown once per draw: the stored value is the date of the draw already revealed on this device
+  const fresh = S.matchups?.d01?.how===J1_HOW ? S.matchups.d01 : null; const seen = store.get('fw-drawshow:'+S.lid);
+  if(fresh ? seen===String(fresh.createdAt) : !!seen) return;
+  const t = lastPickTime(); if(t && Date.now()-t > 48*3600*1000){ store.set('fw-drawshow:'+S.lid, fresh ? String(fresh.createdAt) : '1'); return; } // old draft: no surprise show days later
   draftShow();
 }
 function faClose(){ if(!FA) return; FA.timers.forEach(clearTimeout); FA.timers.forEach(clearInterval); FA = null; document.getElementById('fw-anim')?.remove(); render(); }
 function faLater(fn, ms){ const id = setTimeout(()=>{ if(FA) fn(); }, ms); FA.timers.push(id); return id; }
 function draftShow(){
-  store.set('fw-drawshow:'+S.lid, '1');
+  store.set('fw-drawshow:'+S.lid, S.matchups?.d01?.how===J1_HOW ? String(S.matchups.d01.createdAt) : 'wait');
   const reduce = (()=>{ try{ return matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){ return false; } })();
   FA = {timers:[], lid:S.lid, reduce};
   const el = document.createElement('div'); el.id = 'fw-anim'; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','Fin de la draft et tirage du premier match');
@@ -1969,8 +1859,8 @@ function act2(){
   sfx('turn', .5);
   let waited = 0;
   const go = () => {
-    const pairs = S.matchups?.d01?.pairs;
-    if(pairs && pairs.length){ const w = document.getElementById('fa-wait'); if(w) w.textContent=''; faLater(()=>drawPairs(pairs), FA.reduce?0:900); return; }
+    const pairs = j1Ready();
+    if(pairs){ const w = document.getElementById('fa-wait'); if(w) w.textContent=''; faLater(()=>drawPairs(pairs), FA.reduce?0:900); return; }
     waited += 400; const w = document.getElementById('fa-wait');
     if(w) w.textContent = waited > 2000 ? 'Tirage en cours…' : '';
     if(waited > 25000){ if(w) w.innerHTML = 'Le tirage arrive dans quelques instants. Tu le retrouveras dans la salle de draft.'; showGo(); return; }
@@ -1980,6 +1870,7 @@ function act2(){
 }
 function drawPairs(pairs){
   const box = document.getElementById('fa-duels'); if(!box) return;
+  if(S.matchups?.d01?.createdAt) store.set('fw-drawshow:'+FA.lid, String(S.matchups.d01.createdAt));
   const names = seats().map((_,i)=>seatName(i)); const me = mySeat();
   const slot = (side, k) => `<div class="fa-slot ${side} spin" id="fa-${side}${k}"><b>—</b><small></small></div>`;
   box.innerHTML = pairs.map((_,k) => `<div class="fa-duel" style="animation-delay:${FA.reduce?0:k*.12}s">${slot('l',k)}<span class="fa-vs" id="fa-vs${k}">VS</span>${slot('r',k)}</div>`).join('');
@@ -2155,13 +2046,10 @@ document.addEventListener('click', e => {
   if(t.id==='fiche-close'){ closeFiche(); return; }
   if(t.id==='dd-room'){ S.draftRoom = true; render(); return; }
   if(t.id==='dd-back'){ S.draftRoom = false; render(); return; }
-  if(t.id==='fa-skip'){ const pairs = S.matchups?.d01?.pairs; if(FA && pairs && !document.getElementById('fa-go') && document.getElementById('fa-duels')){ FA.timers.forEach(clearTimeout); FA.timers.forEach(clearInterval); FA.timers=[]; FA.reduce = true; drawPairs(pairs); } else if(FA && pairs && !document.getElementById('fa-duels')){ FA.timers.forEach(clearTimeout); FA.timers=[]; FA.reduce = true; act2(); } else faClose(); return; }
+  if(t.id==='fa-skip'){ const pairs = j1Ready(); if(FA && pairs && !document.getElementById('fa-go') && document.getElementById('fa-duels')){ FA.timers.forEach(clearTimeout); FA.timers.forEach(clearInterval); FA.timers=[]; FA.reduce = true; drawPairs(pairs); } else if(FA && pairs && !document.getElementById('fa-duels')){ FA.timers.forEach(clearTimeout); FA.timers=[]; FA.reduce = true; act2(); } else faClose(); return; }
   if(t.id==='fa-go'){ faClose(); return; }
   if(t.id==='fa-replay'){ if(!FA) draftShow(); return; }
   if(t.id==='sfx-toggle'){ SFX.on = !SFX.on; store.set('fw-sound', SFX.on?'1':'0'); render(); if(SFX.on) sfx('turn', .8, true); return; }
-  if(t.id==='ph-cancel'){ closePhotoEditor(); return; }
-  if(t.id==='ph-save'){ savePhoto(); return; }
-  if(t.dataset.unphoto){ removePhoto(t.dataset.unphoto); return; }
   if(t.dataset.tab){ S.tab=t.dataset.tab; try{history.replaceState(null,'','#'+S.tab)}catch(_){} S.pending=null; S.tx=null; render(); return; }
   if(t.dataset.setupn){ store.set('fw-setup-n', t.dataset.setupn); render(); return; }
   if(t.dataset.role){ S.poolRole=t.dataset.role; render(); return; }
@@ -2211,17 +2099,13 @@ document.addEventListener('change', e => {
   if(t.id==='view-seat'){ S.viewSeat=Number(t.value); S.tx=null; store.set('fw-view:'+S.lid, t.value); render(); }
   if(t.id==='claim-seat' && t.value!==''){ claimSeat(Number(t.value)); }
   if(t.id==='pool-team'){ S.poolTeam=t.value; render(); }
-  if(t.dataset.photo){ const f = t.files && t.files[0]; t.value = ''; if(f) openPhotoEditor(t.dataset.photo, f); }
-  if(t.id==='ph-color'){ store.set('fw-ph-color', t.checked?'1':'0'); photoColor(t.checked); }
 });
 document.addEventListener('input', e => {
-  if(PE && ['ph-zoom','ph-x','ph-y'].includes(e.target.id)){ PE[{'ph-zoom':'zoom','ph-x':'x','ph-y':'y'}[e.target.id]] = Number(e.target.value); drawPE(); return; }
   if(e.target.id==='pool-q'){ S.poolQuery=e.target.value; render(); }
   if(e.target.id && e.target.id.startsWith('seat-name-')){ const n=Number(store.get('fw-setup-n'))||8; store.set('fw-setup-names', JSON.stringify(Array.from({length:n},(_,i)=>$('#seat-name-'+i)?.value||''))); }
 });
 
 // ---------- Boot ----------
-photoColor(store.get('fw-ph-color')==='1');
 const h = (location.hash||'').slice(1); let tabChosen = false;
 if(/^join-[A-Za-z0-9]{4,12}$/.test(h)){ S.joinCode = h.slice(5).toUpperCase(); S.tab = 'ligues'; tabChosen = true; }
 else if(['draft','classement','compo','mercato','journees','cartes','regles','ligues'].includes(h)){ S.tab=h; tabChosen = true; }
@@ -2273,7 +2157,6 @@ function openLeague(lid){
   const fail = () => {};
   db.collection('stats').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>m[d.id]=d.data()); S.stats=m; render(); }, fail);
   db.collection('schedule').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>m[d.id]=d.data()); S.schedule=m; applyCalendar(); render(); }, fail);
-  db.collection('photos').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>{ const v=d.data(); if(PLAYERS[d.id] && v && PHOTO_RE.test(v.img||'')) m[d.id]=v.img; }); S.photos=m; applyPhotoCss(); render(); }, fail);
   if(S.me){
     db.collection('leagues').where('members','array-contains', S.me).onSnapshot(qs => {
       S.leagues = qs.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=> String(a.createdAt).localeCompare(String(b.createdAt)));
