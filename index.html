@@ -1180,7 +1180,7 @@ function viewRules(){
   return `<section class="stack"><div><h2>Règles</h2><p class="lede">Inspiré de l’ancien LoL Fantasy de Riot, en duels quotidiens avec mercato.</p></div>
   <div class="rules-grid">
     <div class="panel prose"><h3>Draft</h3><ul>
-      <li>4, 6, 8 ou 10 joueurs, ordre tiré au sort.</li>
+      <li>2, 4, 6, 8 ou 10 joueurs (2 pour tester ou jouer en tête-à-tête).</li>
       <li>Salon : chacun rejoint sa place et clique sur Prêt.</li>
       <li>Roulette du first pick : chacun tire un nombre de 1 à 100 (jamais deux fois le même). Le plus gros score choisit en premier, puis ordre décroissant.</li>
       <li>Draft en serpent, poste par poste : tour 1 les Tops, tour 2 les Junglers, tour 3 les Mids, tour 4 les ADC, tour 5 les Supports, tour 6 les équipes pros, tours 7 et 8 les 2 remplaçants (n’importe quel joueur, pas d’équipe).</li>
@@ -1390,7 +1390,7 @@ function viewLeagues(){
       <label class="stack" style="gap:4px"><span class="label">Nom de la ligue</span><input class="in" id="lg-name" maxlength="32" placeholder="Ex. Les Rois du Rift"></label>
       <label class="stack" style="gap:4px"><span class="label">Ton pseudo</span><input class="in" id="lg-pseudo" maxlength="24" placeholder="Ton pseudo"></label>
     </div>
-    <div class="row"><span class="label">Joueurs</span><div class="filters"><div class="seg">${[4,6,8,10].map(k=>`<button data-setupn="${k}" aria-pressed="${k===n}">${k}</button>`).join('')}</div></div></div>
+    <div class="row"><span class="label">Joueurs</span><div class="filters"><div class="seg">${[2,4,6,8,10].map(k=>`<button data-setupn="${k}" aria-pressed="${k===n}">${k}</button>`).join('')}</div></div></div>
     <div class="row"><button class="btn primary" id="create-league" ${S.readOnly?'disabled':''}>Créer la ligue</button>${S.readOnly?'<span class="err small">Tu peux consulter la page mais pas créer de ligue.</span>':''}</div>
   </section>`;
   return `<section class="stack"><div><h2>Ligues</h2><p class="lede">Les ligues où tu joues, l’invitation de ta ligue et la création d’une nouvelle ligue.</p></div>
