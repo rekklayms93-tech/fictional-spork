@@ -296,10 +296,53 @@ tr.lead .rank{color:var(--turn)}
 .roll.pop{animation:pop .45s ease-out}
 @keyframes pop{0%{transform:scale(1.6);color:var(--cs-gold)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.roll.pop{animation:none}}
+.cs-rules{font-size:12px;letter-spacing:.04em;color:var(--cs-muted)}
+.cs-rules b{color:var(--cs-gold-hi);font-weight:600}
+.csp-ovr{display:inline-block;margin-left:8px;padding:1px 5px;font-family:var(--f-mono);font-size:11px;font-weight:600;background:var(--cs-gold-hi);color:var(--cs-bg);vertical-align:2px}
+.cs-j1{display:grid;gap:10px;justify-items:center;text-align:center;padding:4px 0 14px;border-bottom:1px solid var(--cs-line-gold)}
+.cs-j1 p{margin:0;color:var(--cs-muted)}
+.cs-j1 .duels{width:100%}
+.cs .duel{background:var(--cs-panel2);border-color:var(--cs-line);color:var(--cs-ink);text-align:left}
+.cs .duel .nm{color:var(--cs-gold-hi)}
+.cs .duel .rc,.cs .duel .vs{color:var(--cs-muted)}
+.cs .duel.mine{border-color:var(--cs-gold);box-shadow:inset 0 0 0 1px var(--cs-gold)}
 .cs-log{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--cs-muted)}
 .cs-log span{border:1px solid var(--cs-line);padding:3px 8px;white-space:nowrap}
 .cs-log b{color:var(--cs-gold-hi);font-weight:600}
 
+
+/* ===== Photos on cards ===== */
+.fut > div{position:relative;z-index:1}
+.fut .f-photo{position:absolute;z-index:0;right:0;top:0;width:74%;bottom:62px;background-size:cover;background-position:center top;
+  filter:grayscale(1) contrast(1.08);
+  -webkit-mask-image:linear-gradient(to bottom,#000 58%,transparent 100%),linear-gradient(to right,transparent 0,#000 28%);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 58%,transparent 100%),linear-gradient(to right,transparent 0,#000 28%);mask-composite:intersect}
+.fut.has-ph .f-top{flex-direction:column;align-items:flex-start;gap:4px}
+.fut.has-ph .f-side{justify-items:start;gap:3px}
+.fut.has-ph .f-ovr{text-shadow:0 1px 6px color-mix(in srgb,var(--b) 70%,transparent)}
+.fut.has-ph.taken .f-photo{opacity:.6}
+body.ph-color .fut .f-photo,body.ph-color .csp-av,body.ph-color .ph-frame canvas{filter:none}
+.csp-av{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;background-size:cover;background-position:center top;filter:grayscale(1);box-shadow:0 0 0 1px var(--cs-line)}
+.ph-teams{display:grid;gap:22px}
+.ph-team h3{margin:0 0 10px;display:flex;gap:10px;align-items:baseline}
+.ph-team h3 small{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.ph-cell{display:grid;gap:6px;min-width:0}
+.ph-cell .fut{cursor:default}
+.ph-acts{display:flex;gap:4px;flex-wrap:wrap}
+.ph-acts label.btn{position:relative;overflow:hidden}
+.ph-acts input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.ph-count{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+#ph-modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.72)}
+#ph-modal .box{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--rad);padding:18px;display:grid;gap:14px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto}
+#ph-modal .cols{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
+#ph-modal .ph-frame{background:var(--sunk);line-height:0;touch-action:none;cursor:grab;justify-self:center}
+#ph-modal .ph-frame canvas{width:180px;height:240px;filter:grayscale(1) contrast(1.08)}
+#ph-modal .ctl{display:grid;gap:12px}
+#ph-modal .ctl label{display:grid;gap:4px;font-size:13px;font-weight:600}
+#ph-modal input[type=range]{width:100%}
+#ph-modal .err{color:var(--bad);font-size:13px}
+@media (max-width:520px){ #ph-modal .cols{grid-template-columns:1fr} }
 /* ===== Ultimate Team style cards ===== */
 .fut{--a:var(--fut-pro-a);--b:var(--fut-pro-b);--i:var(--fut-pro-ink);--e:var(--fut-pro-edge);
   position:relative;display:grid;grid-template-rows:auto 1fr auto auto;gap:5px;min-height:172px;min-width:0;padding:11px 11px 9px;
@@ -367,6 +410,7 @@ tr.lead .rank{color:var(--turn)}
       <button role="tab" data-tab="compo" id="tab-compo">Ma compo</button>
       <button role="tab" data-tab="mercato" id="tab-mercato">Mercato</button>
       <button role="tab" data-tab="journees" id="tab-journees">Journées</button>
+      <button role="tab" data-tab="cartes" id="tab-cartes">Cartes</button>
       <button role="tab" data-tab="regles" id="tab-regles">Règles</button>
       <button role="tab" data-tab="ligues" id="tab-ligues">Ligues</button>
     </nav>
@@ -404,8 +448,9 @@ function seasonLine(pid){
 }
 function futCard(pid, o){
   o = o || {}; const p = PLAYERS[pid]; const L = seasonLine(pid); const team = p.role==='TEAM';
-  return `<button class="fut t-${tierOf(p.ovr)} ${o.cls||''}" ${o.attr||''} ${o.disabled?'disabled':''} title="${esc(p.name)} · ${p.team} · ${ROLE_FR[p.role]} · note ${p.ovr}">
-    ${o.hover ? `<span class="hv">${o.hover}</span>` : ''}
+  const ph = hasPhoto(pid);
+  return `<button class="fut t-${tierOf(p.ovr)} ${ph?'has-ph':''} ${o.cls||''}" ${o.attr||''} ${o.disabled?'disabled':''} title="${esc(p.name)} · ${p.team} · ${ROLE_FR[p.role]} · note ${p.ovr}">
+    ${o.hover ? `<span class="hv">${o.hover}</span>` : ''}${ph ? `<i class="f-photo ph-${pid}" aria-hidden="true"></i>` : ''}
     <div class="f-top"><span class="f-ovr">${p.ovr}</span><span class="f-side">${roleIcon(p.role,20)}<span class="f-team">${p.team}</span></span></div>
     <div class="f-name ${p.name.length>14?'xlong':(p.name.length>8?'long':'')}">${esc(p.name)}</div>
     <div class="f-stats"><span><b>${L?fmt(L.pts):'—'}</b>Pts</span><span><b>${L?L.x:'—'}</b>${team?'V-D':'KDA'}</span><span><b>${L?L.y:'—'}</b>${team?'Games':'CS'}</span></div>
@@ -416,23 +461,23 @@ function roleIcon(role, size){ size = size || 16; return `<svg class="ri" viewBo
 const PICKS_PER_SEAT = 8, MAX_SWAPS = 2;
 
 // r = notes façon Ultimate Team [Top, Jungle, Mid, ADC, Support, Équipe], estimées d'après le top 20 Worlds 2026 de Sheep Esports,
-// les classements par poste de Strafe et le power ranking Sheep Esports (octobre 2026).
+// les classements par poste de Strafe et le power ranking Sheep Esports (octobre 2026), puis ajustées par la ligue le 19/10.
 const TEAMS = [
-  {code:'GEN', name:'Gen.G', p:['Kiin','Canyon','Chovy','Ruler','Duro'], r:[92, 90, 94, 92, 85, 92]},
-  {code:'HLE', name:'Hanwha Life Esports', p:['Zeus','Kanavi','Zeka','Gumayusi','Delight'], r:[93, 91, 90, 90, 88, 91]},
-  {code:'T1',  name:'T1', p:['Doran','Oner','Faker','Peyz','Keria'], r:[86, 86, 90, 91, 93, 88]},
-  {code:'DK',  name:'Dplus KIA', p:['Siwoo','Lucid','ShowMaker','Smash','Career'], r:[83, 84, 87, 83, 82, 84]},
-  {code:'AL',  name:"Anyone's Legend", p:['Breathe','Tarzan','Shanks','hope','Kael'], r:[84, 93, 84, 87, 88, 88]},
-  {code:'BLG', name:'Bilibili Gaming', p:['bin','XUN','Knight','Viper','ON'], r:[89, 85, 92, 90, 89, 89]},
-  {code:'TES', name:'Top Esports', p:['369','Tian','Creme','JackeyLove','Zhuo'], r:[80, 82, 83, 85, 82, 80]},
+  {code:'GEN', name:'Gen.G', p:['Kiin','Canyon','Chovy','Ruler','Duro'], r:[92, 90, 93, 92, 89, 93]},
+  {code:'HLE', name:'Hanwha Life Esports', p:['Zeus','Kanavi','Zeka','Gumayusi','Delight'], r:[93, 91, 92, 92, 89, 92]},
+  {code:'T1',  name:'T1', p:['Doran','Oner','Faker','Peyz','Keria'], r:[88, 88, 90, 91, 93, 88]},
+  {code:'DK',  name:'Dplus KIA', p:['Siwoo','Lucid','ShowMaker','Smash','Career'], r:[85, 87, 88, 88, 85, 84]},
+  {code:'AL',  name:"Anyone's Legend", p:['Breathe','Tarzan','Shanks','hope','Kael'], r:[87, 93, 86, 87, 89, 89]},
+  {code:'BLG', name:'Bilibili Gaming', p:['bin','XUN','Knight','Viper','ON'], r:[90, 90, 93, 92, 90, 90]},
+  {code:'TES', name:'Top Esports', p:['369','Tian','Creme','JackeyLove','Zhuo'], r:[80, 82, 85, 85, 82, 80]},
   {code:'IG',  name:'Invictus Gaming', p:['TheShy','Wei','Rookie','JiaQi','meiko'], r:[82, 82, 84, 80, 83, 81]},
-  {code:'G2',  name:'G2 Esports', p:['BrokenBlade','SkewMond','Caps','Hans Sama','Labrov'], r:[85, 86, 88, 84, 82, 85]},
-  {code:'MKOI',name:'Movistar KOI', p:['Myrwn','Elyoya','jojopyun','Supa','Alvaro'], r:[79, 81, 79, 79, 79, 78]},
-  {code:'KC',  name:'Karmine Corp', p:['Canna','Yike','Kyeahoo','Caliste','Busio'], r:[82, 80, 81, 83, 80, 79]},
-  {code:'TL',  name:'Team Liquid', p:['Morgan','Josedeodo','Quid','Yeon','CoreJJ'], r:[81, 82, 80, 79, 82, 82]},
-  {code:'LYON',name:'LYON', p:['Dhokla','Inspired','Saint','Berserker','Isles'], r:[78, 83, 80, 82, 79, 80]},
+  {code:'G2',  name:'G2 Esports', p:['BrokenBlade','SkewMond','Caps','Hans Sama','Labrov'], r:[86, 87, 88, 87, 86, 85]},
+  {code:'MKOI',name:'Movistar KOI', p:['Myrwn','Elyoya','jojopyun','Supa','Alvaro'], r:[75, 81, 80, 79, 79, 78]},
+  {code:'KC',  name:'Karmine Corp', p:['Canna','Yike','Kyeahoo','Caliste','Busio'], r:[82, 80, 80, 85, 80, 79]},
+  {code:'TL',  name:'Team Liquid', p:['Morgan','Josedeodo','Quid','Yeon','CoreJJ'], r:[81, 85, 80, 79, 82, 82]},
+  {code:'LYON',name:'LYON', p:['Dhokla','Inspired','Saint','Berserker','Isles'], r:[78, 85, 80, 85, 79, 80]},
   {code:'TSW', name:'Team Secret Whales', p:['Pun','Hizto','Dire','Eddie','Bie'], r:[76, 77, 75, 76, 75, 76]},
-  {code:'CFO', name:'CTBC Flying Oyster', p:['Rest','Shad0w','Pout','Doggo','Kino'], r:[75, 77, 76, 77, 76, 73]},
+  {code:'CFO', name:'CTBC Flying Oyster', p:['Rest','Shad0w','Pout','Doggo','Kino'], r:[75, 77, 76, 83, 76, 73]},
   {code:'LOS', name:'LOS', p:['ZEST','Curse','Feisty','Duduhh','Ackerman'], r:[75, 75, 77, 74, 74, 74]},
 ];
 const PLAYERS = {};
@@ -484,7 +529,7 @@ function teamPoints(t){
 const S = {db:null, me:null, isOwner:false, readOnly:false,
   config:null, picks:[], lineups:{}, stats:{}, schedule:{}, moves:[], matchups:{},
   tab:'classement', viewSeat:null, dayId:null, poolRole:'ALL', poolTeam:'ALL', poolQuery:'', pending:null,
-  tx:null, faRole:'ALL', confirmReset:false, room:null, peers:[], loaded:{config:false,picks:false,moves:false,matchups:false,leagues:false}, genBusy:{}, lid:null, leagues:[], joinCode:null, invite:undefined};
+  tx:null, faRole:'ALL', confirmReset:false, room:null, peers:[], loaded:{config:false,picks:false,moves:false,matchups:false,leagues:false}, genBusy:{}, lid:null, leagues:[], joinCode:null, invite:undefined, photos:{}, photoMsg:''};
 let M = null; // computed model
 
 const $ = s => document.querySelector(s);
@@ -524,17 +569,41 @@ const MAIN_ROUNDS = 6;
 const ROUND_ROLE = ['TOP','JNG','MID','ADC','SUP','TEAM'];
 const ROUND_LABEL = ['Tops','Junglers','Mids','ADC','Supports','Équipes','Remplaçants','Remplaçants'];
 const ROUND_ASK = ['ton Top','ton Jungler','ton Mid','ton ADC','ton Support','ton équipe','un remplaçant, n’importe quel poste','ton deuxième remplaçant, n’importe quel poste'];
-function slotFor(roster, player){
+function baseSlot(roster, player){
   const filled = Object.keys(roster).length;
   if(filled >= PICKS_PER_SEAT) return null;
   if(filled < MAIN_ROUNDS) return player.role===ROUND_ROLE[filled] && !roster[player.role] ? player.role : null;
   if(player.role==='TEAM') return null;
   return !roster.SUB1 ? 'SUB1' : (!roster.SUB2 ? 'SUB2' : null);
 }
+// Draft limits for each participant's roster (pro players only, the team pick is not counted):
+// at most 1 player per pro team, at most one player rated 92+, at most one player rated 90-91.
+const CAP_TOP = 92, CAP_HIGH = 90;
+function ruleBlock(roster, player){
+  if(player.role==='TEAM') return '';
+  const mine = Object.values(roster).map(id => PLAYERS[id]).filter(p => p && p.role!=='TEAM');
+  if(mine.some(p => p.team===player.team)) return 'Déjà un joueur '+player.team;
+  if(player.ovr>=CAP_TOP && mine.some(p => p.ovr>=CAP_TOP)) return 'Déjà un joueur 92+';
+  if(player.ovr>=CAP_HIGH && player.ovr<CAP_TOP && mine.some(p => p.ovr>=CAP_HIGH && p.ovr<CAP_TOP)) return 'Déjà un joueur 90-91';
+  return '';
+}
+// Safety net: if no available pro fits the limits, the limits are lifted for that pick so nobody is stuck.
+const relaxCache = {};
+function rulesRelaxed(roster){
+  const key = S.picks.length+'|'+Object.values(roster).join(',');
+  if(key in relaxCache) return relaxCache[key];
+  const own = draftOwner();
+  return relaxCache[key] = !Object.values(PLAYERS).some(p => own[p.id]===undefined && baseSlot(roster,p) && !ruleBlock(roster,p));
+}
+function slotFor(roster, player){
+  const s = baseSlot(roster, player); if(!s) return null;
+  return (!ruleBlock(roster, player) || rulesRelaxed(roster)) ? s : null;
+}
 function blockReason(roster, player){
   const filled = Object.keys(roster).length;
-  if(filled >= MAIN_ROUNDS) return player.role==='TEAM' ? 'Pas en sub' : '';
-  return player.role!==ROUND_ROLE[filled] ? 'Tour des '+ROUND_LABEL[filled] : '';
+  if(filled >= MAIN_ROUNDS){ if(player.role==='TEAM') return 'Pas en sub'; }
+  else if(player.role!==ROUND_ROLE[filled]) return 'Tour des '+ROUND_LABEL[filled];
+  return ruleBlock(roster, player);
 }
 
 // ---------- Season engine (rosters replayed from draft + moves) ----------
@@ -586,22 +655,17 @@ function pickScore(pid, k){
 }
 function scoreSeat(seat, k, roster, st){
   const lu = effectiveLineup(seat, k, roster); const parts = {}; let total = 0;
-  const used = new Set([...ROLES.map(r=>lu[r]), lu.TEAM].filter(Boolean));
+  // Only the 5 starters and the team pick score. Subs never score: they sit on the bench until moved into the lineup.
   ROLES.forEach(r => {
-    let pid = lu[r];
-    let sc = st && pid ? pickScore(pid, k) : {pts:0, note:''};
-    // Auto-sub: a starter without a match gives way to a bench player of the same position who played, if he scored more
-    if(st && pid && !teamPlayed(k, PLAYERS[pid].team)){
-      const alt = roster.find(q => !used.has(q) && PLAYERS[q].role===r && teamPlayed(k, PLAYERS[q].team) && Number(st.players?.[q]?.g)>0);
-      if(alt){ const asc = pickScore(alt, k); if(asc.pts > sc.pts){ used.add(alt); pid = alt; sc = {pts:asc.pts, note:'sub'}; } }
-    }
+    const pid = lu[r];
+    const sc = st && pid ? pickScore(pid, k) : {pts:0, note:''};
     parts[r] = {pid, pts:sc.pts, note:sc.note}; total += sc.pts;
   });
   const c = lu.TEAM; const sc = st && c ? pickScore(c, k) : {pts:0, note:''};
   parts.TEAM = {pid:c, pts:sc.pts, note:sc.note}; total += sc.pts;
   return {seat, total, parts};
 }
-const NOTE_FR = {rest:'repos · moyenne', out:'éliminé · moyenne ×0,5', sub:'remplaçant auto'};
+const NOTE_FR = {rest:'repos · moyenne', out:'éliminé · moyenne ×0,5'};
 function stateTag(k, pid){
   if(!pid) return ''; const st = teamState(k, PLAYERS[pid].team);
   return st==='out' ? '<span class="plays no">Équipe éliminée</span>' : (st==='qualified' ? '<span class="plays yes">Équipe qualifiée</span>' : '');
@@ -759,7 +823,7 @@ function render(){
     if(b.dataset.tab==='mercato'){ const has = M && canActFor(S.viewSeat??-1) && todo(S.viewSeat); b.innerHTML = 'Mercato'+(has?'<span class="badge" aria-label="Action à faire"></span>':''); }
   });
   const v = $('#view');
-  const free = {ligues:viewLeagues, regles:viewRules}[S.tab];
+  const free = {ligues:viewLeagues, regles:viewRules, cartes:viewPhotos}[S.tab];
   if(!S.db && !free){ v.innerHTML = noDb(); return; }
   const ready = S.lid && S.loaded.config && S.loaded.picks && S.loaded.moves && S.loaded.matchups;
   let fn = free || (S.db && S.loaded.leagues && !S.lid ? noLeague : null) || (ready ? (S.config ? {classement:viewStandings, draft:viewDraft, compo:viewLineup, mercato:viewMercato, journees:viewDays}[S.tab] : noLeague) : null);
@@ -810,22 +874,30 @@ function viewStandings(){
     <div class="spread"><div><h2>Classement</h2><p class="lede">Chaque journée, tu affrontes un autre joueur : le plus gros total gagne le duel. Classement aux victoires, puis aux nuls, puis aux points marqués.</p></div>
     <span class="pill">${played}/${DN} journées jouées</span></div>
     <div class="tscroll"><table>
-      <thead><tr><th>#</th><th>Joueur</th><th class="r">Bilan V-N-D</th><th class="r">Points marqués</th><th>Duel J${nd.n}</th></tr></thead>
+      <thead><tr><th>#</th><th>Joueur</th><th class="r">Bilan V-N-D</th><th class="r">Note équipe</th><th class="r">Points marqués</th><th>Duel J${nd.n}</th></tr></thead>
       <tbody>${rows.map((r,i)=>{ const opp = duelOf(nd.i, r.seat); return `<tr class="${i===0&&r.w>0?'lead':''}"><td class="rank">${i+1}</td><td class="name">${esc(seatName(r.seat))}${r.seat===mySeat()?' <span class="pill">moi</span>':''}</td>
-        <td class="r"><span class="rec"><span class="w">${r.w}</span>-${r.d}-<span class="l">${r.l}</span></span></td><td class="r num">${fmt(r.pts)}</td>
+        <td class="r"><span class="rec"><span class="w">${r.w}</span>-${r.d}-<span class="l">${r.l}</span></span></td><td class="r num">${teamOvr(r.seat) ?? '—'}</td><td class="r num">${fmt(r.pts)}</td>
         <td class="muted">${opp!==null && !isLocked(nd)?'contre '+esc(seatName(opp)):'—'}</td></tr>`;}).join('')}</tbody>
     </table></div>
   </section>
   ${ndPairs.length ? `<section class="stack"><h3>Affiches de la J${nd.n} · ${esc(dayLong(nd))} · ${esc(nd.fmt)}</h3><div class="duels">${ndPairs.map(([a,b])=>duelCard(a,b,null,null,null)).join('')}</div></section>` : ''}
   ${lastResults()}`;
 }
+// Team rating: average of the 5 starters + the team pick (subs excluded)
+function teamOvr(seat){
+  let ids;
+  if(M && draftDone()){ const k = nextDay().i; const lu = effectiveLineup(seat, k, M.rosters[seat]||[]); ids = [...ROLES.map(r=>lu[r]), lu.TEAM]; }
+  else { const R = draftSlots()[seat] || {}; ids = [...ROLES,'TEAM'].map(r=>R[r]); }
+  const v = ids.filter(Boolean).map(id => PLAYERS[id]?.ovr).filter(Boolean);
+  return v.length ? Math.round(v.reduce((a,b)=>a+b,0)/v.length) : null;
+}
 function duelCard(a,b,sa,sb,winner){
   const mine = [a,b].includes(mySeat());
   const rec = s => { const r = standings().find(x=>x.seat===s); return r ? `${r.w}-${r.d}-${r.l}` : ''; };
   return `<div class="duel ${mine?'mine':''}">
-    <div class="side ${winner===a?'won':''}"><div class="nm">${esc(seatName(a))}</div><div class="rc">${rec(a)}</div></div>
+    <div class="side ${winner===a?'won':''}"><div class="nm">${esc(seatName(a))}</div><div class="rc">${rec(a)}${teamOvr(a)!==null?' · note '+teamOvr(a):''}</div></div>
     <div class="sc">${sa===null?'<span class="vs">vs</span>':`${fmt(sa)}<span class="vs">–</span>${fmt(sb)}`}</div>
-    <div class="side b ${winner===b?'won':''}"><div class="nm">${esc(seatName(b))}</div><div class="rc">${rec(b)}</div></div></div>`;
+    <div class="side b ${winner===b?'won':''}"><div class="nm">${esc(seatName(b))}</div><div class="rc">${teamOvr(b)!==null?'note '+teamOvr(b)+' · ':''}${rec(b)}</div></div></div>`;
 }
 function lastResults(){
   const k = [...Array(DN).keys()].reverse().find(k=>M.results[k]); if(k===undefined) return '';
@@ -871,12 +943,12 @@ function csPlayer(i, side, mode){
   const hovSlot = hov ? slotFor(R, PLAYERS[hov]) : null;
   const row = (slot, label, rc) => {
     const pid = R[slot]; const isHov = !pid && hovSlot===slot;
-    return `<div class="csp-row ${slot==='TEAM'?'team':''}"><span class="rl" style="--rc:var(--r-${rc})" title="${SLOT_FR[slot]||''}">${label}</span><span class="pv ${pid?'':(isHov?'hover':'empty')}" title="${pid?esc(pname(pid)):''}">${pid?ovrMini(pid)+esc(pname(pid)):(isHov?ovrMini(hov)+esc(pname(hov)):'—')}</span></div>`;
+    return `<div class="csp-row ${slot==='TEAM'?'team':''}"><span class="rl" style="--rc:var(--r-${rc})" title="${SLOT_FR[slot]||''}">${label}</span><span class="pv ${pid?'':(isHov?'hover':'empty')}" title="${pid?esc(pname(pid)):''}">${pid?ovrMini(pid)+avatar(pid)+esc(pname(pid)):(isHov?ovrMini(hov)+avatar(hov)+esc(pname(hov)):'—')}</span></div>`;
   };
   const subs = [R.SUB1, R.SUB2].map((pid,k)=> pid ? esc(pname(pid)) : (hovSlot===('SUB'+(k+1)) ? `<i>${esc(pname(hov))}</i>` : '—')).join(' · ');
   const join = mode==='lobby' && !seat.uid && me===null && S.me && !S.readOnly ? `<button class="ghost join" data-claim="${i}">Rejoindre cette place</button>` : '';
   return `<div class="csp ${cls==='turn'?'now':''}">
-    <div class="csp-h"><span class="csp-name">${pos?`<span class="csp-pos">#${pos}</span>`:''}${esc(seat.name)}${i===me?' (moi)':''}</span><span class="csp-st ${cls}">${P.online[i]?'<span class="csp-on" title="En ligne"></span>':''}${st}</span></div>
+    <div class="csp-h"><span class="csp-name">${pos?`<span class="csp-pos">#${pos}</span>`:''}${esc(seat.name)}${i===me?' (moi)':''}${mode!=='lobby' && teamOvr(i)!==null ? `<span class="csp-ovr" title="Note moyenne : 5 titulaires + équipe">${teamOvr(i)}</span>` : ''}</span><span class="csp-st ${cls}">${P.online[i]?'<span class="csp-on" title="En ligne"></span>':''}${st}</span></div>
     ${mode==='lobby' ? join : `<div class="csp-rows">
       ${ROLES.map(r=>row(r, roleIcon(r,18), r.toLowerCase())).join('')}
       ${row('TEAM', roleIcon('TEAM',18), 'team')}
@@ -956,6 +1028,12 @@ function viewLobby(){
   </section>`;
 }
 
+function j1Draw(){
+  const pairs = S.matchups.d01?.pairs;
+  if(!pairs) return `<div class="cs-j1"><div class="cs-phase">Tirage du premier match</div><p>Tirage au sort en cours…</p></div>`;
+  return `<div class="cs-j1"><div class="cs-phase">Tirage au sort · Premier match · ${esc(dayLong(DAYS[0]))}</div>
+    <div class="duels">${pairs.map(([a,b])=>duelCard(a,b,null,null,null)).join('')}</div></div>`;
+}
 // Draft
 function viewDraft(){
   if(!N()) return setupOrWait();
@@ -1003,6 +1081,7 @@ function viewDraft(){
       <div class="cs-sub">${sub}</div>
       ${done?'':`<div class="cs-timer" id="cs-timer">${clock(lastPickTime())}</div>`}
     </div>
+    ${done ? j1Draw() : ''}
     <div class="cs-grid">${left}
       <div class="cs-center">
         <div class="cs-filters">
@@ -1010,6 +1089,7 @@ function viewDraft(){
           <select class="in" id="pool-team" aria-label="Équipe">${teamOpts}</select>
           <input class="in" id="pool-q" placeholder="Chercher un joueur" value="${esc(S.poolQuery)}" aria-label="Chercher un joueur">
         </div>
+        <div class="cs-rules">Limites : 1 joueur par équipe pro · un seul joueur 92+ · un seul joueur 90-91${oc!==null && rulesRelaxed(roster) && !done ? ' · <b>levées pour ce choix (aucun joueur disponible ne les respecte)</b>' : ''}</div>
         <div class="cs-pool">${tiles}</div>
         ${lock}
       </div>${right}
@@ -1041,7 +1121,7 @@ function viewLineup(){
   const opp = duelOf(k, seat);
   const dayBtns = DAYS.map(d=>`<button class="day" data-luday="${d.id}" aria-pressed="${d===day}"><div class="dn">J${d.n}</div><div class="dd">${esc(dayDate(d))}</div><div class="dw muted">${isLocked(d)?'Verrouillée':'Ouverte'}</div></button>`).join('');
   return `<section class="stack">
-    <div><h2>Compo de ${esc(seatName(seat))}</h2><p class="lede">Choisis un titulaire par poste parmi ton effectif. Sans changement, ta compo précédente est reprise.</p></div>
+    <div><h2>Compo de ${esc(seatName(seat))}${teamOvr(seat)!==null?` <span class="pill" title="Moyenne des 5 titulaires et de l’équipe, remplaçants exclus">Note ${teamOvr(seat)}</span>`:''}</h2><p class="lede">Choisis un titulaire par poste parmi ton effectif. Sans changement, ta compo précédente est reprise.</p></div>
     <div class="days">${dayBtns}</div>
     <div class="spread"><div><b>J${day.n} · ${esc(dayLong(day))} · ${esc(day.fmt)}</b>${opp!==null?` · contre <b>${esc(seatName(opp))}</b>`:''} <span class="muted small">— ${locked?'verrouillée depuis':'verrouillage'} ${esc(dtFmt.format(lockOf(day)))}</span></div>
       <span class="pill ${locked?'':'good'}">${locked?'Verrouillée':'Modifiable'}</span></div>
@@ -1185,19 +1265,20 @@ function viewRules(){
       <li>Roulette du first pick : chacun tire un nombre de 1 à 100 (jamais deux fois le même). Le plus gros score choisit en premier, puis ordre décroissant.</li>
       <li>Draft en serpent, poste par poste : tour 1 les Tops, tour 2 les Junglers, tour 3 les Mids, tour 4 les ADC, tour 5 les Supports, tour 6 les équipes pros, tours 7 et 8 les 2 remplaçants (n’importe quel joueur, pas d’équipe).</li>
       <li>Comme en sélection des champions : tu survoles un joueur (les autres le voient), puis tu verrouilles.</li>
+      <li>Limites de ton effectif : 1 seul joueur par équipe pro (si tu as Caliste, plus aucun autre joueur de Karmine Corp), un seul joueur noté 92 ou plus, un seul joueur noté 90 ou 91. Le choix d’équipe du tour 6 n’est pas concerné.</li>
       <li>Un pro n’appartient qu’à une seule équipe à la fois.</li></ul></div>
     <div class="panel prose"><h3>Duels</h3><ul>
       <li>Chaque jour de Worlds, chacun affronte un autre joueur.</li>
-      <li>J1 tirée au sort, puis affiches façon Swiss : on affronte quelqu’un qui a le même bilan, sans revanche quand c’est possible.</li>
+      <li>J1 tirée au sort dès la fin de la draft, puis affiches façon Swiss : on affronte quelqu’un qui a le même bilan, sans revanche quand c’est possible.</li>
       <li>Avant le premier match du jour, chacun valide un titulaire par poste. L’équipe choisie compte toujours. Sans changement, la compo précédente est reprise.</li>
       <li>Le plus gros total gagne le duel. Égalité parfaite = nul.</li></ul></div>
     <div class="panel prose"><h3>Cartes et notes</h3><ul>
       <li>Chaque joueur et chaque équipe a une carte façon Ultimate Team avec une note sur 100.</li>
-      <li>La note estime le niveau avant les Worlds, d’après le top 20 des experts de Sheep Esports, les classements par poste de Strafe et le power ranking des équipes (octobre 2026). Elle sert de repère pour la draft et ne compte pas dans les points.</li>
+      <li>La note estime le niveau avant les Worlds, d’après le top 20 des experts de Sheep Esports, les classements par poste de Strafe et le power ranking des équipes (octobre 2026), puis ajustée selon nos propres analyses. Elle sert de repère pour la draft et ne compte pas dans les points.</li>
       <li>90 et plus : carte blanche. 85 à 89 : noire, liseré blanc. 80 à 84 : graphite. Moins de 80 : sombre.</li>
       <li>En bas de la carte : moyenne de points fantasy, KDA et CS par partie aux Worlds (pour une équipe : séries gagnées-perdues et nombre de games), mis à jour avec les stats.</li></ul></div>
     <div class="panel prose"><h3>Jours sans match</h3><ul>
-      <li>Remplaçant automatique : si ton titulaire ne joue pas ce jour-là et qu’un de tes remplaçants du même poste a joué, tu gardes le meilleur des deux scores (moyenne du titulaire ou match du remplaçant).</li>
+      <li>Seuls tes 5 titulaires et ton équipe rapportent des points. Les 2 remplaçants ne marquent jamais : ils bloquent 2 joueurs sur ton banc et peuvent entrer dans ta compo avant une journée si tu le décides.</li>
       <li>Repos : un joueur (ou l’équipe choisie) dont l’équipe est encore en lice mais ne joue pas ce jour-là, par exemple qualifiée à 3-0, marque sa moyenne des journées précédentes.</li>
       <li>Éliminé : si son équipe est éliminée (3 défaites en Swiss, ou une série perdue en phase finale), il marque la moitié de sa moyenne. Pense à le remplacer au mercato.</li></ul></div>
     <div class="panel prose"><h3>Mercato</h3><ul>
@@ -1315,14 +1396,13 @@ async function resetAll(){
     for(const k of Object.keys(S.matchups)) await S.db.doc(LG()+'/matchups/'+k).delete();
     const cfg = {...S.config, status:'lobby', ready:{}, rolls:null, rolledAt:null, startedAt:null, order:seats().map((_,i)=>i)};
     await S.db.doc(LG()).set(cfg);
-    await S.db.doc(LG()+'/matchups/d01').set({pairs: randomPairs(), createdAt:new Date().toISOString(), how:'tirage'});
   }, 'Partie réinitialisée : retour au salon');
 }
 // Pairings are generated by whichever player opens the page first once they are due
 async function maybeGenerate(){
   if(!M || S.readOnly || !S.config || !N() || (!isComm() && mySeat()===null)) return;
   let k = -1, how = 'swiss';
-  if(!S.matchups.d01) { k = 0; how = 'tirage'; }
+  if(!S.matchups.d01){ if(draftDone()){ k = 0; how = 'tirage fin de draft'; } }
   else for(let j=1;j<DN;j++){ if(!S.matchups[DAYS[j].id] && S.matchups[DAYS[j-1].id] && M.results[j-1]?.final){ k=j; break; } }
   if(k<0 || S.genBusy[k]) return;
   S.genBusy[k] = true;
@@ -1406,7 +1486,6 @@ async function createLeague(){
   let ok = false;
   await write(async()=>{
     await S.db.doc('leagues/'+lid).set(cfg);
-    await S.db.doc('leagues/'+lid+'/matchups/d01').set({pairs: randomPairs(n), createdAt:new Date().toISOString(), how:'tirage'});
     ok = true;
   }, 'Ligue créée : '+name);
   if(ok){ openLeague(lid); S.tab = 'ligues'; render(); }
@@ -1459,10 +1538,113 @@ async function copyInvite(){
   catch(e){ el.focus(); el.select(); toast('Sélectionné : copie-le avec Ctrl+C'); }
 }
 
+
+// ---------- Photos (added by the players themselves, stored in db "photos/{pid}") ----------
+const PHOTO_W = 240, PHOTO_H = 320;
+const PHOTO_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const hasPhoto = pid => !!(S.photos && S.photos[pid]);
+function applyPhotoCss(){
+  let el = document.getElementById('ph-css');
+  if(!el){ el = document.createElement('style'); el.id = 'ph-css'; document.head.appendChild(el); }
+  el.textContent = Object.entries(S.photos||{}).map(([pid,img]) => `.ph-${pid}{background-image:url("${img}")}`).join('\n');
+}
+const avatar = pid => hasPhoto(pid) ? `<i class="csp-av ph-${pid}" aria-hidden="true"></i>` : '';
+function photoColor(on){ document.body.classList.toggle('ph-color', !!on); }
+
+function viewPhotos(){
+  const n = Object.keys(S.photos||{}).filter(k=>PLAYERS[k]).length, total = Object.keys(PLAYERS).length;
+  const canEdit = !!S.db && !S.readOnly && !!S.me;
+  const color = store.get('fw-ph-color')==='1';
+  const cell = pid => `<div class="ph-cell">${futCard(pid, {attr:'tabindex="-1"'})}
+      ${canEdit ? `<div class="ph-acts"><label class="btn sm">${hasPhoto(pid)?'Changer':'Ajouter une photo'}<input type="file" accept="image/*" data-photo="${pid}" aria-label="Photo de ${esc(PLAYERS[pid].name)}"></label>${hasPhoto(pid)?`<button class="btn sm" data-unphoto="${pid}">Retirer</button>`:''}</div>` : ''}</div>`;
+  return `<div class="panel stack">
+    <h2>Cartes</h2>
+    <p class="lede">Ajoute une photo sur la carte d’un joueur, ou le logo d’une équipe. Choisis l’image, recadre-la, puis enregistre. Toutes les cartes ont le même cadre, et les photos sont visibles par tous les joueurs, dans toutes les ligues. Utilise des images que vous avez le droit d’utiliser.</p>
+    <div class="row" style="gap:14px;align-items:center;flex-wrap:wrap">
+      <span class="ph-count">${n} / ${total} cartes illustrées</span>
+      <label class="row" style="gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="ph-color" ${color?'checked':''}> Photos en couleur (sinon noir et blanc)</label>
+    </div>
+    ${canEdit ? '' : '<p class="muted">Connecte-toi pour ajouter des photos.</p>'}
+    ${S.photoMsg ? `<p class="muted" role="status">${esc(S.photoMsg)}</p>` : ''}
+  </div>
+  <div class="ph-teams" style="margin-top:16px">${TEAMS.map(t => `<section class="ph-team">
+    <h3>${esc(t.name)} <small>${t.code}</small></h3>
+    <div class="ph-grid">${[...ROLES.map(r=>t.code+'-'+r), t.code+'-TEAM'].map(cell).join('')}</div>
+  </section>`).join('')}</div>`;
+}
+
+// Crop editor (kept outside render() so live updates never reset it)
+let PE = null;
+function openPhotoEditor(pid, file){
+  if(!file || !/^image\//.test(file.type)){ return; }
+  const url = URL.createObjectURL(file); const img = new Image();
+  img.onload = () => {
+    const team = PLAYERS[pid].role==='TEAM';
+    PE = {pid, img, url, team, zoom: 1, x: 0, y: team ? 0 : 1};
+    const m = document.createElement('div'); m.id = 'ph-modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Recadrer la photo');
+    m.innerHTML = `<div class="box">
+      <h3 style="margin:0">${esc(PLAYERS[pid].name)} <span class="muted" style="font-weight:500">· ${PLAYERS[pid].team} · ${ROLE_FR[PLAYERS[pid].role]}</span></h3>
+      <div class="cols">
+        <div class="ph-frame" id="ph-frame"><canvas id="ph-cv" width="${PHOTO_W}" height="${PHOTO_H}"></canvas></div>
+        <div class="ctl">
+          <label>Zoom <input type="range" id="ph-zoom" min="${team?0.4:1}" max="3" step="0.01" value="1"></label>
+          <label>Gauche / droite <input type="range" id="ph-x" min="-1" max="1" step="0.01" value="0"></label>
+          <label>Haut / bas <input type="range" id="ph-y" min="-1" max="1" step="0.01" value="${team?0:1}"></label>
+          <p class="muted" style="margin:0;font-size:13px">Tu peux aussi faire glisser l’image. ${team?'Pour un logo, dézoome pour le voir en entier.':'Garde le visage en haut du cadre : le bas de la carte est réservé au pseudo.'}</p>
+          <div class="err" id="ph-err"></div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" id="ph-cancel">Annuler</button><button class="btn primary" id="ph-save">Enregistrer</button></div>
+    </div>`;
+    document.body.appendChild(m);
+    drawPE();
+    const fr = document.getElementById('ph-frame'); let drag = null;
+    fr.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY, px:PE.x, py:PE.y}; fr.setPointerCapture(e.pointerId); });
+    fr.addEventListener('pointermove', e => { if(!drag || !PE) return; const g = geomPE(); const k = PHOTO_W/180;
+      if(g.mx>0) PE.x = Math.max(-1, Math.min(1, drag.px + (e.clientX-drag.x)*k/g.mx));
+      if(g.my>0) PE.y = Math.max(-1, Math.min(1, drag.py + (e.clientY-drag.y)*k/g.my));
+      document.getElementById('ph-x').value = PE.x; document.getElementById('ph-y').value = PE.y; drawPE(); });
+    fr.addEventListener('pointerup', () => drag = null);
+    m.addEventListener('keydown', e => { if(e.key==='Escape') closePhotoEditor(); });
+    document.getElementById('ph-save').focus();
+  };
+  S.photoMsg = '';
+  img.onerror = () => { URL.revokeObjectURL(url); alertPhoto('Image illisible. Essaie un fichier JPG ou PNG.'); };
+  img.src = url;
+}
+function alertPhoto(msg){ S.photoMsg = msg; render(); }
+function geomPE(){
+  const {img, zoom} = PE; const base = Math.max(PHOTO_W/img.naturalWidth, PHOTO_H/img.naturalHeight);
+  const sc = base*zoom, dw = img.naturalWidth*sc, dh = img.naturalHeight*sc;
+  return {dw, dh, mx: Math.abs(dw-PHOTO_W)/2, my: Math.abs(dh-PHOTO_H)/2};
+}
+function drawPE(){
+  const cv = document.getElementById('ph-cv'); if(!cv || !PE) return; const c = cv.getContext('2d');
+  const g = geomPE();
+  const dx = (PHOTO_W-g.dw)/2 + PE.x*g.mx, dy = (PHOTO_H-g.dh)/2 + PE.y*g.my;
+  c.clearRect(0,0,PHOTO_W,PHOTO_H);
+  if(!PE.team){ c.fillStyle = '#1A1A1A'; c.fillRect(0,0,PHOTO_W,PHOTO_H); }
+  c.imageSmoothingQuality = 'high'; c.drawImage(PE.img, dx, dy, g.dw, g.dh);
+}
+function closePhotoEditor(){ if(PE) URL.revokeObjectURL(PE.url); PE = null; document.getElementById('ph-modal')?.remove(); }
+async function savePhoto(){
+  if(!PE || !S.db) return; const cv = document.getElementById('ph-cv'); const btn = document.getElementById('ph-save');
+  let data = PE.team ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.84);
+  if(PE.team && data.length > 180000) data = cv.toDataURL('image/webp', 0.9);
+  if(!PHOTO_RE.test(data) || data.length > 180000) data = cv.toDataURL('image/jpeg', 0.72);
+  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try{ await S.db.collection('photos').doc(PE.pid).set({img:data, by:S.me||'', at:new Date().toISOString()}); closePhotoEditor(); }
+  catch(e){ btn.disabled = false; btn.textContent = 'Enregistrer'; const el = document.getElementById('ph-err'); if(el) el.textContent = e && e.code==='quota_exceeded' ? 'Espace de stockage plein : retire quelques photos.' : 'Enregistrement impossible, réessaie.'; }
+}
+async function removePhoto(pid){ if(!S.db) return; try{ await S.db.collection('photos').doc(pid).delete(); }catch(_){ } }
+
 // ---------- Events ----------
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if(!t) return;
   const seat = S.viewSeat ?? 0;
+  if(t.id==='ph-cancel'){ closePhotoEditor(); return; }
+  if(t.id==='ph-save'){ savePhoto(); return; }
+  if(t.dataset.unphoto){ removePhoto(t.dataset.unphoto); return; }
   if(t.dataset.tab){ S.tab=t.dataset.tab; try{history.replaceState(null,'','#'+S.tab)}catch(_){} S.pending=null; S.tx=null; render(); return; }
   if(t.dataset.setupn){ store.set('fw-setup-n', t.dataset.setupn); render(); return; }
   if(t.dataset.role){ S.poolRole=t.dataset.role; render(); return; }
@@ -1511,16 +1693,20 @@ document.addEventListener('change', e => {
   if(t.id==='view-seat'){ S.viewSeat=Number(t.value); S.tx=null; store.set('fw-view:'+S.lid, t.value); render(); }
   if(t.id==='claim-seat' && t.value!==''){ claimSeat(Number(t.value)); }
   if(t.id==='pool-team'){ S.poolTeam=t.value; render(); }
+  if(t.dataset.photo){ const f = t.files && t.files[0]; t.value = ''; if(f) openPhotoEditor(t.dataset.photo, f); }
+  if(t.id==='ph-color'){ store.set('fw-ph-color', t.checked?'1':'0'); photoColor(t.checked); }
 });
 document.addEventListener('input', e => {
+  if(PE && ['ph-zoom','ph-x','ph-y'].includes(e.target.id)){ PE[{'ph-zoom':'zoom','ph-x':'x','ph-y':'y'}[e.target.id]] = Number(e.target.value); drawPE(); return; }
   if(e.target.id==='pool-q'){ S.poolQuery=e.target.value; render(); }
   if(e.target.id && e.target.id.startsWith('seat-name-')){ const n=Number(store.get('fw-setup-n'))||8; store.set('fw-setup-names', JSON.stringify(Array.from({length:n},(_,i)=>$('#seat-name-'+i)?.value||''))); }
 });
 
 // ---------- Boot ----------
+photoColor(store.get('fw-ph-color')==='1');
 const h = (location.hash||'').slice(1); let tabChosen = false;
 if(/^join-[A-Za-z0-9]{4,12}$/.test(h)){ S.joinCode = h.slice(5).toUpperCase(); S.tab = 'ligues'; tabChosen = true; }
-else if(['classement','draft','compo','mercato','journees','regles','ligues'].includes(h)){ S.tab=h; tabChosen = true; }
+else if(['classement','draft','compo','mercato','journees','cartes','regles','ligues'].includes(h)){ S.tab=h; tabChosen = true; }
 render();
 function autoTab(){
   if(tabChosen || !S.loaded.leagues) return;
@@ -1566,6 +1752,7 @@ function openLeague(lid){
   const fail = () => {};
   db.collection('stats').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>m[d.id]=d.data()); S.stats=m; render(); }, fail);
   db.collection('schedule').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>m[d.id]=d.data()); S.schedule=m; render(); }, fail);
+  db.collection('photos').onSnapshot(qs => { const m={}; qs.docs.forEach(d=>{ const v=d.data(); if(PLAYERS[d.id] && v && PHOTO_RE.test(v.img||'')) m[d.id]=v.img; }); S.photos=m; applyPhotoCss(); render(); }, fail);
   if(S.me){
     db.collection('leagues').where('members','array-contains', S.me).onSnapshot(qs => {
       S.leagues = qs.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=> String(a.createdAt).localeCompare(String(b.createdAt)));
